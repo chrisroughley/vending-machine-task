@@ -1,9 +1,50 @@
 class Item {
-  constructor() {}
+  constructor(itemName, itemPrice, count) {
+    count
+      ? (this[itemName] = { itemName, itemPrice, count })
+      : (this[itemName] = { itemName, itemPrice });
+  }
 }
 
 class Inventory {
-  constructor(coke, tango, water) {}
+  constructor(items) {
+    if (!items) return;
+    items.forEach((item) => {
+      this.addItem(item);
+    });
+  }
+
+  get totalValue() {
+    let totalValue = 0;
+    Object.values(this).forEach((value) => {
+      totalValue += value.itemPrice * value.count;
+    });
+    return totalValue;
+  }
+
+  clearItems() {
+    for (let key in this) {
+      delete this[key];
+    }
+  }
+
+  addItem(item) {
+    const itemKey = Object.keys(item)[0];
+    if (this[itemKey]) {
+      this[itemKey].count += item[itemKey].count || 1;
+    } else {
+      this[itemKey] = { ...Object.values(item)[0] };
+      this[itemKey].count = item[itemKey].count || 1;
+    }
+  }
+}
+
+class Basket extends Inventory {
+  purchaseItems() {
+    const purchasedItems = { ...this };
+    this.clearItems();
+    return purchasedItems;
+  }
 }
 
 class Balance {
@@ -14,11 +55,11 @@ class Balance {
     twentyPence = 0,
     fiftyPence = 0
   ) {
-    this.onePence = { count: onePence, value: 1 };
-    this.fivePence = { count: fivePence, value: 5 };
-    this.tenPence = { count: tenPence, value: 10 };
-    this.twentyPence = { count: twentyPence, value: 20 };
-    this.fiftyPence = { count: fiftyPence, value: 50 };
+    this._onePence = { count: onePence, value: 1 };
+    this._fivePence = { count: fivePence, value: 5 };
+    this._tenPence = { count: tenPence, value: 10 };
+    this._twentyPence = { count: twentyPence, value: 20 };
+    this._fiftyPence = { count: fiftyPence, value: 50 };
   }
 
   get totalValue() {
@@ -32,100 +73,116 @@ class Balance {
   addToBalance(cash) {
     switch (cash) {
       case 1:
-        this.onePence.count++;
+        this._onePence.count++;
         break;
       case 5:
-        this.fivePence.count++;
+        this._fivePence.count++;
         break;
       case 10:
-        this.tenPence.count++;
+        this._tenPence.count++;
         break;
       case 20:
-        this.twentyPence.count++;
+        this._twentyPence.count++;
         break;
       case 50:
-        this.fiftyPence.count++;
+        this._fiftyPence.count++;
         break;
     }
   }
 
   addTransferredBalance(transferredBalance) {
-    this.onePence.count += transferredBalance.onePence.count;
-    this.fivePence.count += transferredBalance.fivePence.count;
-    this.tenPence.count += transferredBalance.tenPence.count;
-    this.twentyPence.count += transferredBalance.twentyPence.count;
-    this.fiftyPence.count += transferredBalance.fiftyPence.count;
+    this._onePence.count += transferredBalance._onePence.count;
+    this._fivePence.count += transferredBalance._fivePence.count;
+    this._tenPence.count += transferredBalance._tenPence.count;
+    this._twentyPence.count += transferredBalance._twentyPence.count;
+    this._fiftyPence.count += transferredBalance._fiftyPence.count;
   }
 
   clearBalance() {
-    this.onePence.count = 0;
-    this.fivePence.count = 0;
-    this.tenPence.count = 0;
-    this.twentyPence.count = 0;
-    this.fiftyPence.count = 0;
+    this._onePence.count = 0;
+    this._fivePence.count = 0;
+    this._tenPence.count = 0;
+    this._twentyPence.count = 0;
+    this._fiftyPence.count = 0;
   }
 }
 
 class VendingMachine {
   constructor() {
-    this.acceptedCash = [1, 5, 10, 20, 50];
-    this.inventory = {
-      coke: { quantity: 10, price: 55 },
-      tango: { quantity: 10, price: 35 },
-      water: { quantity: 10, price: 45 },
-    };
-    this.storedBalance = new Balance(100, 100, 100, 100, 100);
-    this.insertedBalance = new Balance();
-    this.selectedItems = { items: [], totalCost: 0 };
+    this._acceptedCash = [1, 5, 10, 20, 50];
+    this._inventory = new Inventory([
+      new Item("coke", 55, 10),
+      new Item("tango", 35, 10),
+      new Item("water", 45, 10),
+    ]);
+    this._storedBalance = new Balance(100, 100, 100, 100, 100);
+    this._insertedBalance = new Balance();
+    this._selectedItems = new Basket();
   }
 
   insertCash(cash) {
-    if (!this.acceptedCash.includes(cash)) return cash;
-    this.insertedBalance.addToBalance(cash);
+    if (!this._acceptedCash.includes(cash)) return cash;
+    this._insertedBalance.addToBalance(cash);
   }
 
   selectItem(selectedItem) {
-    if (!this.inventory.hasOwnProperty(selectedItem)) return "invalid item";
-    this.selectedItems.items.push(selectedItem);
-    this.selectedItems.totalCost += this.inventory[selectedItem].price;
+    if (!this._inventory.hasOwnProperty(selectedItem)) return "invalid item";
+    this._selectedItems.addItem(
+      new Item(
+        this._inventory[selectedItem].itemName,
+        this._inventory[selectedItem].itemPrice
+      )
+    );
   }
 
   purchaseItems() {
-    if (this.insertedBalance.totalValue < this.selectedItems.totalCost)
+    if (this._insertedBalance.totalValue < this._selectedItems.totalValue)
       return "insufficient funds";
+    const change =
+      this._insertedBalance.totalValue - this._selectedItems.totalValue;
     const purchasedItems = {
-      purchasedItems: [...this.selectedItems.items],
-      change: this.insertedBalance.totalValue - this.selectedItems.totalCost,
+      purchasedItems: this._selectedItems.purchaseItems(),
+      change,
     };
-    purchasedItems.purchasedItems.forEach((purchasedItem) => {
-      this.inventory[purchasedItem].quantity -= 1;
-    });
-    this.storedBalance.addTransferredBalance(this.insertedBalance);
-    this.insertedBalance.clearBalance();
-    this.selectedItems.items = [];
-    this.selectedItems.totalCost = 0;
+    for (let key in purchasedItems.purchasedItems) {
+      this._inventory[key].count -= purchasedItems.purchasedItems[key].count;
+    }
+    this._storedBalance.addTransferredBalance(this._insertedBalance);
+    this._insertedBalance.clearBalance();
     return purchasedItems;
   }
 
   cancelTransaction() {
     const refund = {
-      onePence: { ...this.insertedBalance.onePence },
-      fivePence: { ...this.insertedBalance.fivePence },
-      tenPence: { ...this.insertedBalance.tenPence },
-      twentyPence: { ...this.insertedBalance.twentyPence },
-      fiftyPence: { ...this.insertedBalance.fiftyPence },
+      onePence: {
+        count: this._insertedBalance._onePence.count,
+        value: this._insertedBalance._onePence.value,
+      },
+      fivePence: {
+        count: this._insertedBalance._fivePence.count,
+        value: this._insertedBalance._fivePence.value,
+      },
+      tenPence: {
+        count: this._insertedBalance._tenPence.count,
+        value: this._insertedBalance._tenPence.value,
+      },
+      twentyPence: {
+        count: this._insertedBalance._twentyPence.count,
+        value: this._insertedBalance._twentyPence.value,
+      },
+      fiftyPence: {
+        count: this._insertedBalance._fiftyPence.count,
+        value: this._insertedBalance._fiftyPence.value,
+      },
     };
-    this.selectedItems.items = [];
-    this.selectedItems.totalCost = 0;
-    this.insertedBalance.clearBalance();
+    this._selectedItems.clearItems();
+    this._insertedBalance.clearBalance();
     return refund;
   }
 
   resetMachine() {
-    this.inventory.coke.quantity = 10;
-    this.inventory.tango.quantity = 10;
-    this.inventory.water.quantity = 10;
-    this.storedBalance = new Balance(100, 100, 100, 100, 100);
+    this._inventory.clearItems();
+    this._storedBalance.clearBalance();
   }
 }
 

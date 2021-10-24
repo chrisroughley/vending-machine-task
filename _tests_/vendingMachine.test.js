@@ -9,71 +9,73 @@ describe("Vending Machine Tests", () => {
     describe("acceptedCash property", () => {
       test("should have acceptedCash property", () => {
         const vendingMachine = new VendingMachine();
-        expect(vendingMachine).toHaveProperty("acceptedCash");
+        expect(vendingMachine).toHaveProperty("_acceptedCash");
       });
       test("acceptedCash property should have correct value", () => {
         const vendingMachine = new VendingMachine();
-        expect(vendingMachine.acceptedCash).toEqual([1, 5, 10, 20, 50]);
+        expect(vendingMachine._acceptedCash).toEqual([1, 5, 10, 20, 50]);
       });
     });
     describe("inventory property", () => {
       test("should have inventory property", () => {
         const vendingMachine = new VendingMachine();
-        expect(vendingMachine).toHaveProperty("inventory");
+        expect(vendingMachine).toHaveProperty("_inventory");
       });
       test("inventory property should have correct value", () => {
         const vendingMachine = new VendingMachine();
         const expectedInventory = {
-          coke: { quantity: 10, price: 55 },
-          tango: { quantity: 10, price: 35 },
-          water: { quantity: 10, price: 45 },
+          coke: { itemName: "coke", count: 10, itemPrice: 55 },
+          tango: { itemName: "tango", count: 10, itemPrice: 35 },
+          water: { itemName: "water", count: 10, itemPrice: 45 },
         };
-        expect(vendingMachine.inventory).toEqual(expectedInventory);
+        expect(vendingMachine._inventory).toEqual(expectedInventory);
       });
     });
     describe("storedBalance property", () => {
       test("should have storedBalance property", () => {
         const vendingMachine = new VendingMachine();
-        expect(vendingMachine).toHaveProperty("storedBalance");
+        expect(vendingMachine).toHaveProperty("_storedBalance");
       });
       test("storedBalance property should have correct value", () => {
         const vendingMachine = new VendingMachine();
         const expectedStoredBalance = {
-          onePence: { count: 100, value: 1 },
-          fivePence: { count: 100, value: 5 },
-          tenPence: { count: 100, value: 10 },
-          twentyPence: { count: 100, value: 20 },
-          fiftyPence: { count: 100, value: 50 },
+          _onePence: { count: 100, value: 1 },
+          _fivePence: { count: 100, value: 5 },
+          _tenPence: { count: 100, value: 10 },
+          _twentyPence: { count: 100, value: 20 },
+          _fiftyPence: { count: 100, value: 50 },
         };
-        expect(vendingMachine.storedBalance).toEqual(expectedStoredBalance);
+        expect(vendingMachine._storedBalance).toEqual(expectedStoredBalance);
       });
     });
     describe("insertedBalance property", () => {
       test("should have insertedBalance property", () => {
         const vendingMachine = new VendingMachine();
-        expect(vendingMachine).toHaveProperty("insertedBalance");
+        expect(vendingMachine).toHaveProperty("_insertedBalance");
       });
       test("insertedBalance property should have correct value", () => {
         const vendingMachine = new VendingMachine();
         const expectedInsertedBalance = {
-          onePence: { count: 0, value: 1 },
-          fivePence: { count: 0, value: 5 },
-          tenPence: { count: 0, value: 10 },
-          twentyPence: { count: 0, value: 20 },
-          fiftyPence: { count: 0, value: 50 },
+          _onePence: { count: 0, value: 1 },
+          _fivePence: { count: 0, value: 5 },
+          _tenPence: { count: 0, value: 10 },
+          _twentyPence: { count: 0, value: 20 },
+          _fiftyPence: { count: 0, value: 50 },
         };
-        expect(vendingMachine.insertedBalance).toEqual(expectedInsertedBalance);
+        expect(vendingMachine._insertedBalance).toEqual(
+          expectedInsertedBalance
+        );
       });
     });
     describe("selectedItems property", () => {
       test("should have selectedItems property", () => {
         const vendingMachine = new VendingMachine();
-        expect(vendingMachine).toHaveProperty("selectedItems");
+        expect(vendingMachine).toHaveProperty("_selectedItems");
       });
       test("selectedItems property should have correct value", () => {
         const vendingMachine = new VendingMachine();
-        const expectedSelectedItems = { items: [], totalCost: 0 };
-        expect(vendingMachine.selectedItems).toEqual(expectedSelectedItems);
+        const expectedSelectedItems = {};
+        expect(vendingMachine._selectedItems).toEqual(expectedSelectedItems);
       });
     });
   });
@@ -91,13 +93,13 @@ describe("Vending Machine Tests", () => {
           if (!acceptedValues.includes(i)) {
             expect(vendingMachine.insertCash(i)).toBe(i);
             const expectedInsertedBalance = {
-              onePence: { count: 0, value: 1 },
-              fivePence: { count: 0, value: 5 },
-              tenPence: { count: 0, value: 10 },
-              twentyPence: { count: 0, value: 20 },
-              fiftyPence: { count: 0, value: 50 },
+              _onePence: { count: 0, value: 1 },
+              _fivePence: { count: 0, value: 5 },
+              _tenPence: { count: 0, value: 10 },
+              _twentyPence: { count: 0, value: 20 },
+              _fiftyPence: { count: 0, value: 50 },
             };
-            expect(vendingMachine.insertedBalance).toEqual(
+            expect(vendingMachine._insertedBalance).toEqual(
               expectedInsertedBalance
             );
           }
@@ -107,25 +109,35 @@ describe("Vending Machine Tests", () => {
         const vendingMachine = new VendingMachine();
         vendingMachine.insertCash(1);
         let expectedInsertedBalance = {
-          onePence: { count: 1, value: 1 },
-          fivePence: { count: 0, value: 5 },
-          tenPence: { count: 0, value: 10 },
-          twentyPence: { count: 0, value: 20 },
-          fiftyPence: { count: 0, value: 50 },
+          _onePence: { count: 1, value: 1 },
+          _fivePence: { count: 0, value: 5 },
+          _tenPence: { count: 0, value: 10 },
+          _twentyPence: { count: 0, value: 20 },
+          _fiftyPence: { count: 0, value: 50 },
         };
-        expect(vendingMachine.insertedBalance).toEqual(expectedInsertedBalance);
+        expect(vendingMachine._insertedBalance).toEqual(
+          expectedInsertedBalance
+        );
         vendingMachine.insertCash(5);
-        expectedInsertedBalance.fivePence.count = 1;
-        expect(vendingMachine.insertedBalance).toEqual(expectedInsertedBalance);
+        expectedInsertedBalance._fivePence.count = 1;
+        expect(vendingMachine._insertedBalance).toEqual(
+          expectedInsertedBalance
+        );
         vendingMachine.insertCash(10);
-        expectedInsertedBalance.tenPence.count = 1;
-        expect(vendingMachine.insertedBalance).toEqual(expectedInsertedBalance);
+        expectedInsertedBalance._tenPence.count = 1;
+        expect(vendingMachine._insertedBalance).toEqual(
+          expectedInsertedBalance
+        );
         vendingMachine.insertCash(20);
-        expectedInsertedBalance.twentyPence.count = 1;
-        expect(vendingMachine.insertedBalance).toEqual(expectedInsertedBalance);
+        expectedInsertedBalance._twentyPence.count = 1;
+        expect(vendingMachine._insertedBalance).toEqual(
+          expectedInsertedBalance
+        );
         vendingMachine.insertCash(50);
-        expectedInsertedBalance.fiftyPence.count = 1;
-        expect(vendingMachine.insertedBalance).toEqual(expectedInsertedBalance);
+        expectedInsertedBalance._fiftyPence.count = 1;
+        expect(vendingMachine._insertedBalance).toEqual(
+          expectedInsertedBalance
+        );
       });
     });
     describe("selectItem method", () => {
@@ -140,20 +152,24 @@ describe("Vending Machine Tests", () => {
       test("should add selected item to selectedItems", () => {
         const vendingMachine = new VendingMachine();
         vendingMachine.selectItem("coke");
-        let expectedSelectedItems = { items: ["coke"], totalCost: 55 };
-        expect(vendingMachine.selectedItems).toEqual(expectedSelectedItems);
+        let expectedSelectedItems = {
+          coke: { count: 1, itemName: "coke", itemPrice: 55 },
+        };
+        expect(vendingMachine._selectedItems).toEqual(expectedSelectedItems);
         vendingMachine.selectItem("tango");
         expectedSelectedItems = {
-          items: ["coke", "tango"],
-          totalCost: 90,
+          coke: { count: 1, itemName: "coke", itemPrice: 55 },
+          tango: { count: 1, itemName: "tango", itemPrice: 35 },
         };
-        expect(vendingMachine.selectedItems).toEqual(expectedSelectedItems);
+        expect(vendingMachine._selectedItems).toEqual(expectedSelectedItems);
         vendingMachine.selectItem("water");
         expectedSelectedItems = {
-          items: ["coke", "tango", "water"],
-          totalCost: 135,
+          coke: { count: 1, itemName: "coke", itemPrice: 55 },
+          tango: { count: 1, itemName: "tango", itemPrice: 35 },
+          water: { count: 1, itemName: "water", itemPrice: 45 },
         };
-        expect(vendingMachine.selectedItems).toEqual(expectedSelectedItems);
+        expect(vendingMachine._selectedItems).toEqual(expectedSelectedItems);
+        expect(vendingMachine._selectedItems.totalValue).toBe(135);
       });
     });
     describe("purchaseItems method", () => {
@@ -172,7 +188,12 @@ describe("Vending Machine Tests", () => {
         vendingMachine1.selectItem("coke");
         vendingMachine1.insertCash(50);
         vendingMachine1.insertCash(5);
-        let expectedPurchasedItems = { purchasedItems: ["coke"], change: 0 };
+        let expectedPurchasedItems = {
+          purchasedItems: {
+            coke: { count: 1, itemName: "coke", itemPrice: 55 },
+          },
+          change: 0,
+        };
         expect(vendingMachine1.purchaseItems()).toEqual(expectedPurchasedItems);
         const vendingMachine2 = new VendingMachine();
         vendingMachine2.selectItem("tango");
@@ -180,7 +201,10 @@ describe("Vending Machine Tests", () => {
         vendingMachine2.insertCash(50);
         vendingMachine2.insertCash(50);
         expectedPurchasedItems = {
-          purchasedItems: ["tango", "water"],
+          purchasedItems: {
+            tango: { count: 1, itemName: "tango", itemPrice: 35 },
+            water: { count: 1, itemName: "water", itemPrice: 45 },
+          },
           change: 20,
         };
         expect(vendingMachine2.purchaseItems()).toEqual(expectedPurchasedItems);
@@ -192,13 +216,15 @@ describe("Vending Machine Tests", () => {
         vendingMachine.insertCash(20);
         vendingMachine.purchaseItems();
         const expectedInsertedBalance = {
-          onePence: { count: 0, value: 1 },
-          fivePence: { count: 0, value: 5 },
-          tenPence: { count: 0, value: 10 },
-          twentyPence: { count: 0, value: 20 },
-          fiftyPence: { count: 0, value: 50 },
+          _onePence: { count: 0, value: 1 },
+          _fivePence: { count: 0, value: 5 },
+          _tenPence: { count: 0, value: 10 },
+          _twentyPence: { count: 0, value: 20 },
+          _fiftyPence: { count: 0, value: 50 },
         };
-        expect(vendingMachine.insertedBalance).toEqual(expectedInsertedBalance);
+        expect(vendingMachine._insertedBalance).toEqual(
+          expectedInsertedBalance
+        );
       });
       test("should reset selectedItems after purchase", () => {
         const vendingMachine = new VendingMachine();
@@ -206,8 +232,8 @@ describe("Vending Machine Tests", () => {
         vendingMachine.insertCash(50);
         vendingMachine.insertCash(50);
         vendingMachine.purchaseItems();
-        const expectedSelectedItems = { items: [], totalCost: 0 };
-        expect(vendingMachine.selectedItems).toEqual(expectedSelectedItems);
+        const expectedSelectedItems = {};
+        expect(vendingMachine._selectedItems).toEqual(expectedSelectedItems);
       });
 
       test("should update inventory property after purchase", () => {
@@ -220,11 +246,11 @@ describe("Vending Machine Tests", () => {
         vendingMachine.insertCash(50);
         vendingMachine.purchaseItems();
         const expectedInventory = {
-          coke: { quantity: 9, price: 55 },
-          tango: { quantity: 9, price: 35 },
-          water: { quantity: 9, price: 45 },
+          coke: { itemName: "coke", count: 9, itemPrice: 55 },
+          tango: { itemName: "tango", count: 9, itemPrice: 35 },
+          water: { itemName: "water", count: 9, itemPrice: 45 },
         };
-        expect(vendingMachine.inventory).toEqual(expectedInventory);
+        expect(vendingMachine._inventory).toEqual(expectedInventory);
       });
       test("should update stored cash after purchase", () => {
         const vendingMachine = new VendingMachine();
@@ -232,13 +258,13 @@ describe("Vending Machine Tests", () => {
         vendingMachine.insertCash(50);
         vendingMachine.purchaseItems();
         const expectedStoredBalance = {
-          onePence: { count: 100, value: 1 },
-          fivePence: { count: 100, value: 5 },
-          tenPence: { count: 100, value: 10 },
-          twentyPence: { count: 100, value: 20 },
-          fiftyPence: { count: 101, value: 50 },
+          _onePence: { count: 100, value: 1 },
+          _fivePence: { count: 100, value: 5 },
+          _tenPence: { count: 100, value: 10 },
+          _twentyPence: { count: 100, value: 20 },
+          _fiftyPence: { count: 101, value: 50 },
         };
-        expect(vendingMachine.storedBalance).toEqual(expectedStoredBalance);
+        expect(vendingMachine._storedBalance).toEqual(expectedStoredBalance);
       });
     });
     describe("cancelTransaction method", () => {
@@ -268,13 +294,15 @@ describe("Vending Machine Tests", () => {
         vendingMachine.insertCash(20);
         vendingMachine.cancelTransaction();
         const expectedInsertedBalance = {
-          onePence: { count: 0, value: 1 },
-          fivePence: { count: 0, value: 5 },
-          tenPence: { count: 0, value: 10 },
-          twentyPence: { count: 0, value: 20 },
-          fiftyPence: { count: 0, value: 50 },
+          _onePence: { count: 0, value: 1 },
+          _fivePence: { count: 0, value: 5 },
+          _tenPence: { count: 0, value: 10 },
+          _twentyPence: { count: 0, value: 20 },
+          _fiftyPence: { count: 0, value: 50 },
         };
-        expect(vendingMachine.insertedBalance).toEqual(expectedInsertedBalance);
+        expect(vendingMachine._insertedBalance).toEqual(
+          expectedInsertedBalance
+        );
       });
       test("should reset selectedItems after cancellation", () => {
         const vendingMachine = new VendingMachine();
@@ -282,8 +310,8 @@ describe("Vending Machine Tests", () => {
         vendingMachine.insertCash(50);
         vendingMachine.insertCash(50);
         vendingMachine.cancelTransaction();
-        const expectedSelectedItems = { items: [], totalCost: 0 };
-        expect(vendingMachine.selectedItems).toEqual(expectedSelectedItems);
+        const expectedSelectedItems = {};
+        expect(vendingMachine._selectedItems).toEqual(expectedSelectedItems);
       });
     });
     describe("resetMachine method", () => {
@@ -298,20 +326,16 @@ describe("Vending Machine Tests", () => {
         vendingMachine.insertCash(50);
         vendingMachine.purchaseItems();
         vendingMachine.resetMachine();
-        const expectedInventory = {
-          coke: { quantity: 10, price: 55 },
-          tango: { quantity: 10, price: 35 },
-          water: { quantity: 10, price: 45 },
-        };
-        expect(vendingMachine.inventory).toEqual(expectedInventory);
+        const expectedInventory = {};
+        expect(vendingMachine._inventory).toEqual(expectedInventory);
         const expectedStoredBalance = {
-          onePence: { count: 100, value: 1 },
-          fivePence: { count: 100, value: 5 },
-          tenPence: { count: 100, value: 10 },
-          twentyPence: { count: 100, value: 20 },
-          fiftyPence: { count: 100, value: 50 },
+          _onePence: { count: 0, value: 1 },
+          _fivePence: { count: 0, value: 5 },
+          _tenPence: { count: 0, value: 10 },
+          _twentyPence: { count: 0, value: 20 },
+          _fiftyPence: { count: 0, value: 50 },
         };
-        expect(vendingMachine.storedBalance).toEqual(expectedStoredBalance);
+        expect(vendingMachine._storedBalance).toEqual(expectedStoredBalance);
       });
     });
   });
