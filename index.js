@@ -108,6 +108,7 @@ class Balance {
 }
 
 class VendingMachine {
+  // #_acceptedCash;
   constructor() {
     this._acceptedCash = [1, 5, 10, 20, 50];
     this._inventory = new Inventory([
@@ -155,24 +156,19 @@ class VendingMachine {
   cancelTransaction() {
     const refund = {
       onePence: {
-        count: this._insertedBalance._onePence.count,
-        value: this._insertedBalance._onePence.value,
+        ...this._insertedBalance._onePence,
       },
       fivePence: {
-        count: this._insertedBalance._fivePence.count,
-        value: this._insertedBalance._fivePence.value,
+        ...this._insertedBalance._fivePence,
       },
       tenPence: {
-        count: this._insertedBalance._tenPence.count,
-        value: this._insertedBalance._tenPence.value,
+        ...this._insertedBalance._tenPence,
       },
       twentyPence: {
-        count: this._insertedBalance._twentyPence.count,
-        value: this._insertedBalance._twentyPence.value,
+        ...this._insertedBalance._twentyPence,
       },
       fiftyPence: {
-        count: this._insertedBalance._fiftyPence.count,
-        value: this._insertedBalance._fiftyPence.value,
+        ...this._insertedBalance._fiftyPence,
       },
     };
     this._selectedItems.clearItems();
